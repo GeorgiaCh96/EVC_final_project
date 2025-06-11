@@ -1,0 +1,9 @@
+# Core
+numpy==1.23.5
+opencv-python
+pyzbar
+matplotlib             
+cv_bridge
+kaggle 
+gdown
+tqdm

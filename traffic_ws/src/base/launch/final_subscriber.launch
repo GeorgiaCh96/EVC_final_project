@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="base" type="final_subscriber_node.py" name="final_subscriber_node" output="screen"/>
+</launch>

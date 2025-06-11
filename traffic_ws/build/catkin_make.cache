@@ -1,0 +1,2 @@
+base
+-DCATKIN_DEVEL_PREFIX=/home/jetbot/EVC/traffic_ws/devel -DCMAKE_INSTALL_PREFIX=/home/jetbot/EVC/traffic_ws/install -G Unix Makefiles

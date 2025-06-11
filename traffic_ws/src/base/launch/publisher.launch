@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="base" type="publisher_node.py" name="publisher_node" output="screen">
+    <rosparam command="load" file="$(find base)/config/parameters.yaml" />
+  </node>
+</launch>

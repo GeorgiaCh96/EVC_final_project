@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="base" type="processing_motion_det.py" name="processing_node_motion_det" output="screen">
+    <rosparam command="load" file="$(find base)/config/parameters.yaml" />
+  </node>
+</launch>

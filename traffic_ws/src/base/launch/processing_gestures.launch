@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="base" type="processing_node_gestures.py" name="processing_node_gestures" output="screen"/>
+</launch>
