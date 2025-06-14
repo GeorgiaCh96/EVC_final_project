@@ -8,6 +8,8 @@ from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import String
 from ultralytics import YOLO 
 
+# Constants
+THRESHOLD = 7000
 
 class Yolov8Detector:
     def __init__(self):
@@ -38,8 +40,6 @@ class Yolov8Detector:
             CompressedImage,
             queue_size=1
         )
-
-        self.new_cmd = None
         
         self.initialized=True
         rospy.loginfo("YOLO detector node initialized!")
@@ -97,21 +97,27 @@ class Yolov8Detector:
             for (x1, y1, x2, y2), cls_id, conf in zip(boxes, classes, scores):
                 label_txt = f"{self.model.names[int(cls_id)]} {conf*100:.0f}%"
 
+                area = (x2 - x1) * (y2 - y1)
+
+                
+
                 cv2.rectangle(img_rgb, (int(x1), int(y1)), (int(x2), int(y2)),
                             (0, 255, 0), 2)
+
                 cv2.putText(img_rgb, label_txt, (int(x1), int(y1)-10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1)
                 
                 # publish motion command
-                if classes.size != 0:
-                    if int(cls_id) in range(2,14):
-                        self.new_cmd = "GO 0.3"
+                if classes.size != 0 and area > THRESHOLD:
+                    msg = String()
+                    if int(cls_id) in list(range(2,14)):
+                        msg.data = "GO 0.04"
+                        rospy.logwarn("YOLO REPORTED %s", msg.data)
+                        self.command_pub.publish(msg)
                     elif int(cls_id) == 14:
-                        self.new_cmd = "STOP"
-
-                    self.command_pub.publish(self.new_cmd)
-                    
-                            
+                        msg.data = "STOP"
+                        rospy.logwarn("YOLO REPORTED %s", msg.data)
+                        self.command_pub.publish(msg)
                     
             
             success, encoded_image = cv2.imencode(".jpg", img_rgb)

@@ -43,6 +43,15 @@ class ViewNode:
         )
 
 
+        self.sub_gestures = rospy.Subscriber(
+            "/camera/processed_image_line_tracking",
+            CompressedImage,
+            self.show_motion,
+            buff_size=2**24,
+            queue_size=None
+        )
+
+
         rospy.loginfo("Camera subscriber node initialized!")
 
     def show_barcode(self, data):

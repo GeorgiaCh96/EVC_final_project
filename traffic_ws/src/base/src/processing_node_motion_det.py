@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rospy, numpy, cv2
 from sensor_msgs.msg import CompressedImage
-from std_msgs.msg import Bool
+from std_msgs.msg import String
 
 # Constants
 FILENAME = "motion.avi"
@@ -16,7 +16,7 @@ class MotionNode:
         # Set time buffer
         self.count = 0
 
-        self.current = False
+        self.locked = False
 
         # Configure cv2
         self.fgbg = cv2.createBackgroundSubtractorMOG2()
@@ -26,7 +26,8 @@ class MotionNode:
         self.width = 640
         self.height = 480
         self.out = cv2.VideoWriter(FILENAME,
-                                   fourcc,30,
+                                   fourcc,
+                                   15,
                                    (self.width * 2, self.height))
         
         # Construct subscriber
@@ -41,7 +42,7 @@ class MotionNode:
         # Construct area publisher
         self.pub_area = rospy.Publisher(
             "/motion/nomotion_motion_command",
-            Bool,
+            String,
             queue_size=1,
         )
 
@@ -77,15 +78,15 @@ class MotionNode:
                     max_area = area
                     max_contour = contour
 
-            report = Bool()
+            report = String()
             
             # Show on image
             if (max_area > DETECTION_THRESHOLD):
                 # Report motion
-                if not self.current: 
-                    report.data = True
+                if not self.locked: 
+                    report.data = "LOCK"
                     self.pub_area.publish(report)
-                    self.current = True
+                    self.locked = True
                 # Get bounding box coordinates
                 x, y, w, h = cv2.boundingRect(max_contour)
                 # Draw bounding box around object
@@ -94,14 +95,14 @@ class MotionNode:
                 cv2.putText(tracked_img, f"Movement Detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             else:
                 # Report motion
-                if self.current:
-                    report.data = False
+                if self.locked:
+                    report.data = "UNLOCK"
                     self.pub_area.publish(report)
-                    self.current = False
+                    self.locked = False
                 # Add text
                 cv2.putText(tracked_img, 'No Movement Detected', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
 
-            # # Show frame
+            # Show frame
             cv2.imshow('Tracked', tracked_img)
             cv2.waitKey(1)
             

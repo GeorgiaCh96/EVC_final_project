@@ -100,7 +100,7 @@ class CameraProcessingNode:
         pinky = is_up(20, 18)
 
         if all([thumb, index, middle, ring, pinky]):
-            "GO 100 0.3"
+            return "GO 0.02"
         # elif index and middle and not (thumb or ring or pinky):
         #     return "GO 100 0.3"
         else:
