@@ -63,7 +63,7 @@ PC's IPv4 address. Also you have to
 expose the XML-RPC and TCPROS ports that you defined in the rospy.init_node.
 
 
-`docker run -it --rm -e ROS_MASTER_URI=http://192.168.8.2:11311 -e ROS_IP=192.168.8.141 -p 45100:45100 -p 45101:45101 test_node
+`docker run -it --rm -e ROS_MASTER_URI=http://192.168.8.2:11311 -e ROS_IP=192.168.8.141 -p 45100:45100 -p 45101:45101 -p 45200:45200 -p 45201:45201 -p 45300:45300 -p 45301:45301 -p 45400:45400 -p 45401:45401 -p 45500:45500 -p 45501:45501 -p 45600:45600 -p 45601:45601 -p 45700:45700 -p 45701:45701 test_node
 `
 
 
