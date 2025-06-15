@@ -74,7 +74,41 @@ cd ~/traffic_ws/src/base/src
 Then, run the following Python scripts, each in a new terminal (or use `tmux`):
 
 ```
-
+python3 calibration_node.py
+python3 processing_node_line.py
+python3 processing_node_color.py
+python3 processing_node_barcode.py
+python3 processing_node_gestures.py
+python3 processing_node_motion_det.py
+python3 processing_node_yolo.py'
+python3 decision_node.py
 ```
 
+### On the Jetson (ROS Master)
+
+After connection to the Jetson via SSH, launch the following nodes by:
+
+Navigate to the workspace:
+
+```
+cd ~/traffic_ws
+```
+
+Build the workspace:
+
+```
+catkin_make
+```
+
+Source the workspace so that ROS can recognize your packages:
+```
+source devel/setup.bash
+```
+
+Launch the nodes:
+
+```
+roslaunch base publisher.launch
+rosrun base final_subscriber_node_line.py
+```
 
