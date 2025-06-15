@@ -15,7 +15,7 @@ RUN groupadd --gid $USER_GID $USERNAME && \
 RUN apt-get update && apt-get install -y \
     git iputils-ping x11-apps sshfs sshpass net-tools \
     netcat openssh-server avahi-daemon libnss-mdns iproute2 \
-    tmux vim nano curl libzbar0 libzbar-dev
+    tmux vim nano curl libzbar0 libzbar-dev dos2unix
 
 
 # Add sudo and Python 3
@@ -55,6 +55,8 @@ RUN rm -rf /home/ubuntu/traffic_ws/build /home/ubuntu/traffic_ws/devel /home/ubu
 
 COPY traffic_ws/src/startup.sh /home/ubuntu/traffic_ws/src/startup.sh
 RUN chmod +x /home/ubuntu/traffic_ws/src/startup.sh && chown ubuntu:ubuntu /home/ubuntu/traffic_ws/src/startup.sh
+
+RUN dos2unix /home/ubuntu/traffic_ws/src/startup.sh
 
 
 # Rosdep update
