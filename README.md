@@ -149,3 +149,5 @@ Receives commands from the decision and line tracking nodes, translating them in
 ## ROS Node Graph
 
 The following diagram shows the communication between all ROS nodes using `rqt_graph`:
+
+![ROS Node Graph](rqt_graph.jpg)
