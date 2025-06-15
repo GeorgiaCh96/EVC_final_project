@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import cv2, rospy, numpy
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import CompressedImage
