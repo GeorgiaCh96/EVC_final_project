@@ -1,162 +1,80 @@
-# How to achieve communication between docker container and the jetson.
+# Traffic Robot System — Setup Instructions (Windows)
 
-These instructions are applicable for Windows machines.
+These instructions will guide you through setting up and running the traffic robot control system using Docker, ROS, and supporting scripts. This guide is tailored specifically for **Windows environments**.
 
-First of all, open the following applications:
+---
+## Prerequisites: Start the Required Applications
 
+Before running the system, make sure the following services are configured and running:
 
-* XLaunch:
-  1. Run XLaunch from the Windows Taskbar
-  2. Select Multiple Windows
-  3. Set Display number to 0
-  4. Select Start no client
-  5. Check Disable access control
-  6. Finish
+### XLaunch (X11 Forwarding)
 
-* Docker Desktop
+  1. Run XLaunch from the Windows Taskbar.
+  2. Select Multiple Windows.
+  3. Set Display number to 0.
+  4. Select Start no client.
+  5. Check Disable access control.
+  6. Finish.
 
-Also, you have to disable the public network firewall because it will try to block UDP communications between your container and the 
-Jetson
+### Docker Desktop
 
+Ensure Docker Desktop is installed and running.
 
-In this demo, we work with the Workshop4 scripts, and we will run the **processing node** on the docker container, while the
-**publisher** and **subscriber nodes** will run on the jetson.
+### Disable Windows Public Network Firewall (Temporarily)
 
-In a nutshell:
+UDP communication between your container and the Jetson device might be blocked by the firewall. To avoid this temporarily **disable the Public Network firewall**.
 
-* The **camera publisher node** is publishing raw images. 
+## Running the Docker Container
 
-* The **camera processing node** is  subscribing in raw images. It publishes:
-  1.	processed images (images went through fisheye view undistortion method, face detection and facial emotion recognition models), topic name: **/camera/processed_image**
-  2.	facial emotion recognition predictions, topic name: **/camera/FER_prediction**
+To interact with the container you have to explicitly set the `ROS_MASTER_URI` to the jetson's IP, and `ROS_IP` to your 
+PC's IPv4 address. These IP addresses must be correctly configured in two places:
 
-* Finally, the **camera subscriber node** is subscribing for processed images and FER predictions.
+At the `Dockerfile` locate and change:
 
-The ROS nodes communication is described by the following RQT graph:
+```
+ARG ROS_MASTER_URI=http://192.168.8.2:11311
+ARG CLIENT_IP=192.168.8.141
+```
 
-![rqt_graph](../workshop4_2074028_dockerized_LOCAL/Screenshot 2025-05-22 185013.png)
+At the `traffic_ws/src/startup.sh` locate and change:
 
-First, in the **processing_node** you have to set fixed ports:
+```
+export ROS_MASTER_URI=http://192.168.8.2:11311
+export ROS_IP=192.168.8.141
+export DISPLAY=192.168.8.141:0
+```
 
-`rospy.init_node('processing_node', xmlrpc_port=45100, tcpros_port=45101)`
-
-You're telling the processing_node (running inside Docker) — to:
-
-* Accept XML-RPC requests (e.g., for parameter server, node registration) on port 45100
-
-* Accept TCPROS connections (e.g., for topic communication -- pub/sub) on port 45101
-
-If you don’t define the ports manually, then ROS chooses random ones — which will not
-work across machines.
-
------------------------------------------
-DOCKER
-------
-
-First build the container:
+ Then build the container:
 
 `docker build -t test_node:latest .`
 
-
-To interact with the container you have to explicitly set the ROS_MASTER_URI to the jetson's IP, and ROS_IP to your 
-PC's IPv4 address. Also you have to 
-expose the XML-RPC and TCPROS ports that you defined in the rospy.init_node.
+Start the container using the following command:
 
 
 `docker run -it --rm -e ROS_MASTER_URI=http://192.168.8.2:11311 -e ROS_IP=192.168.8.141 -p 45100:45100 -p 45101:45101 -p 45200:45200 -p 45201:45201 -p 45300:45300 -p 45301:45301 -p 45400:45400 -p 45401:45401 -p 45500:45500 -p 45501:45501 -p 45600:45600 -p 45601:45601 -p 45700:45700 -p 45701:45701 test_node
 `
 
+## Launching the ROS nodes
 
-Inside the docker set these environment variables:
+Once the container is running, you need to launch the appropriate scripts on both:
 
-`export ROS_MASTER_URI=http://192.168.8.2:11311`
+- **The Docker container (Windows host)**
+- **The Jetson device (ROS master)**
 
-`export ROS_IP=192.168.8.141 `
+---
 
-`export DISPLAY=192.168.8.141:0`
+### On the Docker Container (Your Windows Machine)
 
-Then run the following commands: 
+Inside the container, navigate to the following directory:
 
-#### Step 1. change ownership
-`sudo chown -R ubuntu:ubuntu /home/ubuntu/traffic_ws`
+```
+cd ~/traffic_ws/src/base/src
+```
 
+Then, run the following Python scripts, each in a new terminal (or use `tmux`):
 
-#### Step 2: Clean the previous build (optional, but good after big changes)
-`sudo rm -rf build/ devel/`
+```
 
-#### Step 3: Source ROS (required for catkin_make)
-`source /opt/ros/noetic/setup.bash`
-
-
-#### Step 4: Rebuild your workspace
-`catkin_make`
-
-#### Step 5: Source your workspace (to expose messages, services, etc.)
-`source devel/setup.bash`
-
-#### Step 6 (optional): Add PYTHONPATH to .bashrc if not already added
-`echo 'export PYTHONPATH=$PYTHONPATH:/home/ubuntu/traffic_ws/devel/lib/python3.8/dist-packages' >> ~/.bashrc`
-
-#### Step 7 (optional): Add workspace sourcing to .bashrc if not already added
-`echo 'source ~/traffic_ws/devel/setup.bash' >> ~/.bashrc`
-
-#### Step 8 (only needed if you modified .bashrc during this session)
-
-`source ~/.bashrc`
-
-Then run the node
-
-'python src/motion/src/camera_processing_node.py'
-
-`cd src/jetson_camera/src/`
-
-`python camera_processing_node.py`
-
-
-
-
-------------------------------------------
-JETSON
------
-
-First, check if `xeyes` works. 
-If it does not work, then run on your local machine:
-
-`ipconfig` and evaluate your PC's IPv4 Address. 
-
-e.g. `IPv4 ...... 192.168.8.248`
-
-Then run:
-
-export `DISPLAY=192.168.8.248:0`
-
-Check again if `xeyes` works. 
-Then, navigate in your workspace, e.g.
-
-`cd ~/EVC/workshops/Georgia_docker/workshop4_motion_2074028`
-
-and run:
-
-`catkin_make`
-
-`source ~/.bashrc`
-
-`source ./devel/setup.bash`
-
-Note: you might also need to run
-
-`export DISPLAY=192.168.8.248:0
-`
-with the IP pointing to your PC's IPv4. If you do that, then run again:
-
-`source ~/.bashrc`
-
-
-To launch the ROS publisher and subscriber nodes, run:
-
-`roslaunch jetson_camera camera_publisher.launch`
-
-`roslaunch jetson_camera camera_subscriber.launch`
-
+```
 
 
