@@ -80,7 +80,7 @@ python3 processing_node_color.py
 python3 processing_node_barcode.py
 python3 processing_node_gestures.py
 python3 processing_node_motion_det.py
-python3 processing_node_yolo.py'
+python3 processing_node_yolo.py
 python3 decision_node.py
 ```
 
@@ -112,3 +112,40 @@ roslaunch base publisher.launch
 roslaunch base final_subscriber.launch
 ```
 
+## Python Scripts Overview
+
+This section provides a brief explanation of the function of each Python script.
+
+#### `publisher_node.py`  
+Captures real-time video frames from the Jetson Nano's CSI camera and publishes.
+
+#### `calibration_node.py`  
+Applies distortion correction to raw camera images using precomputed calibration matrices and publishes undistorted frames for downstream processing.
+
+#### `processing_node_line.py`  
+Processes undistorted images to detect and track lane lines, generating directional commands (`LEFT`, `RIGHT`, or `CENTERED`) to help the robot stay on course.
+
+#### `processing_node_color.py`  
+Analyzes dominant colors in the image using KNN and issues movement commands based on predefined color rules, such as green for "GO" and red for "STOP".
+
+#### `processing_node_barcode.py`  
+Scans and decodes QR/barcodes from the video feed to interpret directional commands like "TURN LEFT" or "TURN RIGHT".
+
+#### `processing_node_gestures.py`  
+Uses MediaPipe Hands to detect hand gestures and publishes a forward movement command when an open-hand (five fingers extended) gesture is recognized.
+
+#### `processing_node_motion_det.py`  
+Detects motion in the camera frame using background subtraction and contour analysis, locking or unlocking robot movement based on dynamic changes.
+
+#### `processing_node_yolo.py`  
+Applies a YOLOv8 object detection model to recognize road signs, triggering speed adjustments or stops when speed limit or STOP signs are detected.
+
+#### `decision_node.py`  
+Aggregates commands from all processing nodes and determines the robot’s next action based on a fixed-priority scheduling system to ensure safety and responsiveness.
+
+#### `final_subscriber_node_line.py`  
+Receives commands from the decision and line tracking nodes, translating them into motor driver signals to execute actions like moving forward, stopping, or turning.
+
+## ROS Node Graph
+
+The following diagram shows the communication between all ROS nodes using `rqt_graph`:
