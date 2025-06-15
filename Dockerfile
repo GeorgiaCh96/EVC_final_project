@@ -53,8 +53,6 @@ COPY traffic_ws /home/ubuntu/traffic_ws
 RUN rm -rf /home/ubuntu/traffic_ws/build /home/ubuntu/traffic_ws/devel /home/ubuntu/traffic_ws/install && \
     chown -R ubuntu:ubuntu /home/ubuntu/traffic_ws
 
-RUN chown -R ubuntu:ubuntu /home/ubuntu/traffic_ws
-
 COPY traffic_ws/src/startup.sh /home/ubuntu/traffic_ws/src/startup.sh
 RUN chmod +x /home/ubuntu/traffic_ws/src/startup.sh && chown ubuntu:ubuntu /home/ubuntu/traffic_ws/src/startup.sh
 

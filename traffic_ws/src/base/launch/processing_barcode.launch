@@ -1,3 +1,0 @@
-<launch>
-  <node pkg="base" type="processing_node_barcode.py" name="processing_node_barcode" output="screen"/>
-</launch>

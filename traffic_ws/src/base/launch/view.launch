@@ -1,3 +1,0 @@
-<launch>
-  <node pkg="base" type="view_node.py" name="view_node" output="screen"/>
-</launch>

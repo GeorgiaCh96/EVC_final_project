@@ -28,7 +28,12 @@ install(DIRECTORY launch/
 )
 # Install Python scripts
 catkin_install_python(PROGRAMS
+  src/publisher_node.py
+  src/calibration_node.py
+  src/decision_node.py
+  src/final_subscriber_node_line.py
   src/processing_node_gestures.py
+  src/processing_node_line.py
   src/processing_node_motion_det.py
   src/processing_node_barcode.py
   src/processing_node_colour.py

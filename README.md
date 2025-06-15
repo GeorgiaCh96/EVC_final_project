@@ -109,6 +109,6 @@ Launch the nodes:
 
 ```
 roslaunch base publisher.launch
-rosrun base final_subscriber_node_line.py
+roslaunch base final_subscriber.launch
 ```
 
